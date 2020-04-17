@@ -129,7 +129,7 @@ clean:
 
 # Spawn a Bash shell for the development image
 bash:
-	# TODO: Decide @mkdir -p .config .venv ${APP_PATH}
+	@mkdir -p ${DOCKER_HOST_PROJECT_PATH}/.homedir
 	@docker run \
 		${DOCKER_ARGS} \
 		--rm -it \
