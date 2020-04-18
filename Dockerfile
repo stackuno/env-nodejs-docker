@@ -11,6 +11,15 @@ ARG DOCKER_BASE_IMAGE
 
 FROM ${DOCKER_BASE_IMAGE} AS dev-image
 
+# Copy install-deps.sh for project-specified installation commands
+COPY ./install-deps.sh /tmp/install-deps.sh
+
+# Install system dependencies and run project-specified installation commands
+# Note that there are no packages installed by default
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    && . /tmp/install-deps.sh \
+    && rm -rf /var/lib/apt/lists/*
+
 ARG PROJECT=app
 ENV PROJECT=${PROJECT}
 WORKDIR /tmp/${PROJECT}
