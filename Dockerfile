@@ -1,5 +1,5 @@
 # NOTE: Do not provide a default value in order to make this choice explicit
-ARG DOCKER_BASE_IMAGE
+ARG BASE_IMAGE
 
 
 FROM ${BASE_IMAGE} AS build
@@ -52,7 +52,7 @@ COPY --chown=node . /opt/${PROJECT}/
 
 # Run installation command
 # TODO: Experiment with copying node packages from build image
-COPY --chown=node --from=build /tmp/${PROJECT}/node-modules /opt/${PROJECT}/node-modules
+COPY --chown=node --from=build /tmp/${PROJECT}/node_modules /opt/${PROJECT}/node_modules
 #ARG NODEJS_PACKAGE_INSTALL_COMMAND
 #RUN ${NODEJS_PACKAGE_INSTALL_COMMAND}
 
