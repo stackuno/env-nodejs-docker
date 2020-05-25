@@ -10,14 +10,16 @@ jobs:
     name: Test Realworld
     runs-on: ubuntu-latest
     steps:
-      - name: Init
-        run: pwd && env && ls -la
-      - name: Clone Test App Repository
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Test
+        run: pwd && echo ====== && ls -la && echo ====== && env
+      - name: Clone test application
         run: git clone --depth 1 $REPO_URL $REPO_DIR
         env:
           REPO_DIR: src
           REPO_URL: https://github.com/gothinkster/node-express-realworld-example-app.git
-      - name: Build Docker Image
+      - name: Build Docker image
         run: ./test/node-express-realworld-example-app/test.sh
         env:
           DOCKERFILE: Dockerfile
