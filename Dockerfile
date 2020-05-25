@@ -1,49 +1,35 @@
-# This Dockerfile requires a build context that provides the necessary assets
-# to install system dependencies and Node.js packages. The following assets are
-# requires:
-# - install-deps.sh for the installation of system dependencies through apt-get
-# - package.json for the installation of Node.js packages
-
-# Prefer COPY over ADD
-
 # NOTE: Do not provide a default value in order to make this choice explicit
 ARG DOCKER_BASE_IMAGE
 
 
-FROM ${DOCKER_BASE_IMAGE} AS dev-image
+FROM ${BASE_IMAGE} AS build
 
-# Copy install-deps.sh for project-specified installation commands
-COPY ./install-deps.sh /tmp/install-deps.sh
-
-# Install system dependencies and run project-specified installation commands
-# Note that there are no packages installed by default
+# Install system dependencies
+ARG SYSTEM_PACKAGES=""
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    && . /tmp/install-deps.sh \
+    ${SYSTEM_PACKAGES} \
     && rm -rf /var/lib/apt/lists/*
 
 ARG PROJECT=app
 ENV PROJECT=${PROJECT}
 
-# For the development image, application-specific assets are stored into a
-# subdirectory of "/tmp" which is the FHS-designated destination for temporary
-# files.
 WORKDIR /tmp/${PROJECT}
 
 # Copy Node.js dependency manifest into temporary working directory
 COPY package.json /tmp/${PROJECT}/
 
 # Install Node.js packages
-ARG NODEJS_PACKAGE_INSTALL_COMMAND="npm install"
-RUN ${NODEJS_PACKAGE_INSTALL_COMMAND}
+ARG NODEJS_PACKAGE_INSTALLER="npm install"
+RUN ${NODEJS_PACKAGE_INSTALLER}
 
 
-FROM ${DOCKER_BASE_IMAGE} AS prod-image
+FROM ${BASE_IMAGE} AS production
 
 # Set the default user to the built-in node (non-root) user
 USER node
 
 # Copy libraries from build image
-COPY --from=dev-image /usr/lib /usr/lib
+COPY --from=build /usr/lib /usr/lib
 
 ARG PROJECT=app
 ENV PROJECT=${PROJECT}
@@ -66,11 +52,10 @@ COPY --chown=node . /opt/${PROJECT}/
 
 # Run installation command
 # TODO: Experiment with copying node packages from build image
-ARG NODEJS_PACKAGE_INSTALL_COMMAND
-RUN ${NODEJS_PACKAGE_INSTALL_COMMAND}
+COPY --chown=node --from=build /tmp/${PROJECT}/node-modules /opt/${PROJECT}/node-modules
+#ARG NODEJS_PACKAGE_INSTALL_COMMAND
+#RUN ${NODEJS_PACKAGE_INSTALL_COMMAND}
 
-# Do not provide default ports in order to make this choice explicit
-ARG DOCKER_PORTS
-
-# Expose the ports for the services
-EXPOSE ${DOCKER_PORTS}
+# NOTE: Do not define default to PORTS in order to make this choice explicit
+ARG PORTS
+EXPOSE ${PORTS}
