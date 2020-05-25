@@ -1,0 +1,37 @@
+---
+stages:
+  - build
+  - test
+
+.docker_template: &docker
+  image: docker:19.03.8
+  services:
+    - docker:19.03.8-dind
+
+git-clone:
+  artifacts:
+    paths:
+      - src
+  interruptible: true
+  stage: build
+  variables:
+    REPO_DIR: src
+    REPO_URL: https://github.com/gothinkster/node-express-realworld-example-app.git
+  script:
+    - git clone --depth 1 $REPO_URL $REPO_DIR
+
+python-3.8.0:
+  <<: *docker
+  dependencies:
+    - git-clone
+  interruptible: true
+  needs:
+    - git-clone
+  stage: test
+  variables:
+    DOCKERFILE: Dockerfile
+    DOCKER_BASE_IMAGE: node:13.13.0-stretch-slim
+    PROJECT: stackuno-node
+    REPO_DIR: src
+  script:
+    - ./test/node-express-realworld-example-app/test.sh

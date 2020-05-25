@@ -1,0 +1,17 @@
+---
+stages:
+  - test
+  - deploy
+
+node-express-realworld:
+  stage: test
+  trigger:
+    include: test/node-express-realworld-example-app/.gitlab-ci.yml
+    strategy: depend
+
+build:
+  stage: deploy
+  script:
+    - env
+  rules:
+    - when: manual
