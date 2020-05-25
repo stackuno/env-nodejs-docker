@@ -130,9 +130,9 @@ DOCKER_CACHE_FLAG ?= "--no-cache"
 #   packages
 DOCKER_BUILD_ARGS = \
 	--build-arg=BASE_IMAGE="$(DOCKER_BASE_IMAGE)" \
+	--build-arg=NODEJS_PACKAGE_INSTALLER="$(NODEJS_PACKAGE_INSTALLER)" \
 	--build-arg=PORTS="$(DOCKER_CONTAINER_PORTS)" \
 	--build-arg=PROJECT="$(PROJECT_NAME)" \
-	--build-arg=NODEJS_PACKAGE_INSTALLER="$(NODEJS_PACKAGE_INSTALLER)" \
 	--build-arg=SYSTEM_PACKAGES="$(SYSTEM_PACKAGES)"
 
 # Define the command line arguments to use in spawning Docker runs.
