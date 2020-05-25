@@ -1,0 +1,26 @@
+name: Realtime Builds
+on: [push]
+
+jobs:
+  #  git_clone:
+  #    name: Clone Repository
+  #    runs-on: ubuntu-latest
+  test_docker_build:
+    name: Test Realworld
+    runs-on: ubuntu-latest
+    steps:
+      - name: Init
+        run: pwd && env && ls -la
+      - name: Clone Test App Repository
+        run: git clone --depth 1 $REPO_URL $REPO_DIR
+        env:
+          REPO_DIR: src
+          REPO_URL: https://github.com/gothinkster/node-express-realworld-example-app.git
+      - name: Build Docker Image
+        uses: docker://${DOCKER_BASE_IMAGE}
+        run: ./test/node-express-realworld-example-app/test.sh
+        env:
+          DOCKERFILE: Dockerfile
+          DOCKER_BASE_IMAGE: node:13.13.0-stretch-slim
+          PROJECT: stackuno-node
+          REPO_DIR: src
