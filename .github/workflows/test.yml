@@ -1,3 +1,4 @@
+---
 name: Realtime Builds
 on: [push]
 
@@ -17,7 +18,6 @@ jobs:
           REPO_DIR: src
           REPO_URL: https://github.com/gothinkster/node-express-realworld-example-app.git
       - name: Build Docker Image
-        uses: docker://${DOCKER_BASE_IMAGE}
         run: ./test/node-express-realworld-example-app/test.sh
         env:
           DOCKERFILE: Dockerfile
